@@ -1,0 +1,178 @@
+{
+  "dashboard": {
+    "title": "Analytics Dashboard",
+    "subtitle": "Real-time Business Intelligence",
+    "stats": [
+      {
+        "id": "revenue",
+        "title": "Total Revenue",
+        "value": "$125,430",
+        "change": "+12.5%",
+        "icon": "iconly-boldWallet",
+        "color": "purple",
+        "trend": "up"
+      },
+      {
+        "id": "orders",
+        "title": "New Orders",
+        "value": "2,847",
+        "change": "+8.2%",
+        "icon": "iconly-boldBag-2",
+        "color": "blue",
+        "trend": "up"
+      },
+      {
+        "id": "customers",
+        "title": "Active Users",
+        "value": "18,592",
+        "change": "+15.3%",
+        "icon": "iconly-boldProfile",
+        "color": "green",
+        "trend": "up"
+      },
+      {
+        "id": "conversion",
+        "title": "Conversion Rate",
+        "value": "3.24%",
+        "change": "-2.1%",
+        "icon": "iconly-boldChart",
+        "color": "red",
+        "trend": "down"
+      }
+    ],
+    "recentTransactions": [
+      {
+        "id": "TXN001",
+        "customer": "Sarah Johnson",
+        "avatar": "assets/static/images/faces/1.jpg",
+        "amount": "$1,250.00",
+        "status": "completed",
+        "date": "2024-01-15",
+        "type": "Purchase"
+      },
+      {
+        "id": "TXN002",
+        "customer": "Michael Chen",
+        "avatar": "assets/static/images/faces/2.jpg",
+        "amount": "$890.50",
+        "status": "pending",
+        "date": "2024-01-15",
+        "type": "Subscription"
+      },
+      {
+        "id": "TXN003",
+        "customer": "Emma Wilson",
+        "avatar": "assets/static/images/faces/3.jpg",
+        "amount": "$2,100.00",
+        "status": "completed",
+        "date": "2024-01-14",
+        "type": "Purchase"
+      },
+      {
+        "id": "TXN004",
+        "customer": "David Rodriguez",
+        "avatar": "assets/static/images/faces/4.jpg",
+        "amount": "$675.25",
+        "status": "failed",
+        "date": "2024-01-14",
+        "type": "Refund"
+      },
+      {
+        "id": "TXN005",
+        "customer": "Lisa Anderson",
+        "avatar": "assets/static/images/faces/5.jpg",
+        "amount": "$1,450.75",
+        "status": "completed",
+        "date": "2024-01-13",
+        "type": "Purchase"
+      }
+    ],
+    "topProducts": [
+      {
+        "id": "PRD001",
+        "name": "Premium Subscription",
+        "category": "Software",
+        "sales": 1247,
+        "revenue": "$62,350",
+        "growth": "+18.5%"
+      },
+      {
+        "id": "PRD002",
+        "name": "Mobile App License",
+        "category": "Software",
+        "sales": 892,
+        "revenue": "$44,600",
+        "growth": "+12.3%"
+      },
+      {
+        "id": "PRD003",
+        "name": "Consulting Services",
+        "category": "Services",
+        "sales": 456,
+        "revenue": "$91,200",
+        "growth": "+25.7%"
+      },
+      {
+        "id": "PRD004",
+        "name": "Training Package",
+        "category": "Education",
+        "sales": 324,
+        "revenue": "$16,200",
+        "growth": "+8.9%"
+      }
+    ],
+    "notifications": [
+      {
+        "id": "NOT001",
+        "title": "New Order Received",
+        "message": "Order #12847 from Sarah Johnson",
+        "time": "2 minutes ago",
+        "type": "success",
+        "read": false
+      },
+      {
+        "id": "NOT002",
+        "title": "Payment Failed",
+        "message": "Payment for order #12846 failed",
+        "time": "15 minutes ago",
+        "type": "error",
+        "read": false
+      },
+      {
+        "id": "NOT003",
+        "title": "System Update",
+        "message": "Scheduled maintenance completed",
+        "time": "1 hour ago",
+        "type": "info",
+        "read": true
+      },
+      {
+        "id": "NOT004",
+        "title": "New User Registration",
+        "message": "5 new users registered today",
+        "time": "2 hours ago",
+        "type": "success",
+        "read": true
+      }
+    ],
+    "chartData": {
+      "revenue": {
+        "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        "data": [65000, 72000, 68000, 85000, 92000, 125430]
+      },
+      "userGrowth": {
+        "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+        "data": [1200, 1850, 2100, 2847]
+      }
+    }
+  },
+  "user": {
+    "name": "Alex Thompson",
+    "username": "@alexthompson",
+    "avatar": "assets/static/images/faces/1.jpg",
+    "role": "Business Analyst",
+    "department": "Analytics",
+    "email": "alex.thompson@company.com",
+    "joinDate": "2023-03-15"
+  }
+}

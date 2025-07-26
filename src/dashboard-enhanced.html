@@ -1,0 +1,438 @@
+{% set title = 'Enhanced Analytics Dashboard' %}
+{% set filename = 'dashboard-enhanced.html' %}
+
+{% extends 'src/layouts/master.html' %}
+
+{% block styles %}
+<link rel="stylesheet" href="/assets/scss/iconly.scss">
+<style>
+    .stats-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border: none;
+        border-radius: 12px;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .stats-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    .trend-up { color: #28a745; }
+    .trend-down { color: #dc3545; }
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .status-completed { background-color: #d4edda; color: #155724; }
+    .status-pending { background-color: #fff3cd; color: #856404; }
+    .status-failed { background-color: #f8d7da; color: #721c24; }
+    .notification-item {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border-left: 4px solid;
+        transition: background-color 0.2s;
+    }
+    .notification-item:hover {
+        background-color: #f8f9fa;
+    }
+    .notification-success { border-left-color: #28a745; }
+    .notification-error { border-left-color: #dc3545; }
+    .notification-info { border-left-color: #17a2b8; }
+    .product-row {
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+    }
+    .product-row:last-child {
+        border-bottom: none;
+    }
+    .growth-positive { color: #28a745; }
+    .growth-negative { color: #dc3545; }
+    .custom-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div class="custom-header">
+        <h2 id="dashboard-title">Loading...</h2>
+        <p id="dashboard-subtitle" class="mb-0">Loading...</p>
+    </div>
+</div> 
+<div class="page-content"> 
+    <section class="row">
+        <div class="col-12 col-lg-9">
+            <!-- Stats Cards -->
+            <div class="row" id="stats-container">
+                <!-- Stats will be loaded here -->
+            </div>
+            
+            <!-- Revenue Chart -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Revenue Trend</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart-revenue"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Transactions and Top Products -->
+            <div class="row">
+                <div class="col-12 col-xl-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Recent Transactions</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Amount</th>
+                                            <th>Type</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="transactions-table">
+                                        <!-- Transactions will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Top Products</h4>
+                        </div>
+                        <div class="card-body" id="top-products">
+                            <!-- Top products will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-12 col-lg-3">
+            <!-- User Profile -->
+            <div class="card">
+                <div class="card-body py-4 px-4">
+                    <div class="d-flex align-items-center" id="user-profile">
+                        <!-- User profile will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notifications -->
+            <div class="card">
+                <div class="card-header">
+                    <h4>Recent Notifications</h4>
+                </div>
+                <div class="card-content pb-4" id="notifications-container">
+                    <!-- Notifications will be loaded here -->
+                </div>
+            </div> 
+            
+            <!-- User Growth Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h4>User Growth</h4>
+                </div>
+                <div class="card-body">
+                    <div id="chart-user-growth"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- Need: Apexcharts -->
+<script src="assets/extensions/apexcharts/apexcharts.min.js"></script>
+<script>
+// Dashboard Data Management
+class DashboardManager {
+    constructor() {
+        this.data = null;
+        this.init();
+    }
+
+    async init() {
+        try {
+            await this.loadData();
+            this.renderDashboard();
+        } catch (error) {
+            console.error('Failed to load dashboard data:', error);
+            this.showError();
+        }
+    }
+
+    async loadData() {
+        const response = await fetch('data.json');
+        if (!response.ok) {
+            throw new Error('Failed to fetch data');
+        }
+        this.data = await response.json();
+    }
+
+    renderDashboard() {
+        this.renderHeader();
+        this.renderStats();
+        this.renderTransactions();
+        this.renderTopProducts();
+        this.renderUserProfile();
+        this.renderNotifications();
+        this.renderCharts();
+    }
+
+    renderHeader() {
+        document.getElementById('dashboard-title').textContent = this.data.dashboard.title;
+        document.getElementById('dashboard-subtitle').textContent = this.data.dashboard.subtitle;
+    }
+
+    renderStats() {
+        const container = document.getElementById('stats-container');
+        container.innerHTML = '';
+
+        this.data.dashboard.stats.forEach(stat => {
+            const statCard = `
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card stats-card">
+                        <div class="card-body px-4 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
+                                    <div class="stats-icon ${stat.color} mb-2">
+                                        <i class="${stat.icon}"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                    <h6 class="text-muted font-semibold">${stat.title}</h6>
+                                    <h6 class="font-extrabold mb-0">${stat.value}</h6>
+                                    <small class="trend-${stat.trend}">${stat.change}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += statCard;
+        });
+    }
+
+    renderTransactions() {
+        const tbody = document.getElementById('transactions-table');
+        tbody.innerHTML = '';
+
+        this.data.dashboard.recentTransactions.forEach(transaction => {
+            const row = `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar avatar-md">
+                                <img src="${transaction.avatar}" alt="${transaction.customer}">
+                            </div>
+                            <p class="font-bold ms-3 mb-0">${transaction.customer}</p>
+                        </div>
+                    </td>
+                    <td class="font-bold">${transaction.amount}</td>
+                    <td>${transaction.type}</td>
+                    <td>
+                        <span class="status-badge status-${transaction.status}">${transaction.status}</span>
+                    </td>
+                    <td>${new Date(transaction.date).toLocaleDateString()}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+    renderTopProducts() {
+        const container = document.getElementById('top-products');
+        container.innerHTML = '';
+
+        this.data.dashboard.topProducts.forEach(product => {
+            const productItem = `
+                <div class="product-row">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">${product.name}</h6>
+                            <small class="text-muted">${product.category}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="font-bold">${product.revenue}</div>
+                            <small class="growth-positive">${product.growth}</small>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">${product.sales} sales</small>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += productItem;
+        });
+    }
+
+    renderUserProfile() {
+        const container = document.getElementById('user-profile');
+        const user = this.data.user;
+        
+        container.innerHTML = `
+            <div class="avatar avatar-xl">
+                <img src="${user.avatar}" alt="${user.name}">
+            </div>
+            <div class="ms-3 name">
+                <h5 class="font-bold">${user.name}</h5>
+                <h6 class="text-muted mb-0">${user.username}</h6>
+                <small class="text-muted">${user.role}</small>
+            </div>
+        `;
+    }
+
+    renderNotifications() {
+        const container = document.getElementById('notifications-container');
+        container.innerHTML = '';
+
+        this.data.dashboard.notifications.slice(0, 4).forEach(notification => {
+            const notificationItem = `
+                <div class="notification-item notification-${notification.type} ${notification.read ? 'opacity-75' : ''}">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="mb-1">${notification.title}</h6>
+                        <small class="text-muted">${notification.time}</small>
+                    </div>
+                    <p class="mb-0 small">${notification.message}</p>
+                </div>
+            `;
+            container.innerHTML += notificationItem;
+        });
+    }
+
+    renderCharts() {
+        // Wait a bit for DOM to be ready
+        setTimeout(() => {
+            this.renderRevenueChart();
+            this.renderUserGrowthChart();
+        }, 100);
+    }
+
+    renderRevenueChart() {
+        const chartData = this.data.dashboard.chartData.revenue;
+        
+        const options = {
+            series: [{
+                name: 'Revenue',
+                data: chartData.data
+            }],
+            chart: {
+                type: 'area',
+                height: 350,
+                toolbar: { show: false }
+            },
+            colors: ['#667eea'],
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.7,
+                    opacityTo: 0.3,
+                }
+            },
+            dataLabels: { enabled: false },
+            stroke: { curve: 'smooth', width: 3 },
+            xaxis: {
+                categories: chartData.labels
+            },
+            yaxis: {
+                labels: {
+                    formatter: function (val) {
+                        return '$' + (val / 1000).toFixed(0) + 'K';
+                    }
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return '$' + val.toLocaleString();
+                    }
+                }
+            }
+        };
+
+        const chart = new ApexCharts(document.querySelector("#chart-revenue"), options);
+        chart.render();
+    }
+
+    renderUserGrowthChart() {
+        const chartData = this.data.dashboard.chartData.userGrowth;
+        
+        const options = {
+            series: [{
+                name: 'New Users',
+                data: chartData.data
+            }],
+            chart: {
+                type: 'bar',
+                height: 300,
+                toolbar: { show: false }
+            },
+            colors: ['#28a745'],
+            plotOptions: {
+                bar: {
+                    borderRadius: 4,
+                    horizontal: false,
+                }
+            },
+            dataLabels: { enabled: false },
+            xaxis: {
+                categories: chartData.labels
+            },
+            yaxis: {
+                labels: {
+                    formatter: function (val) {
+                        return val.toLocaleString();
+                    }
+                }
+            }
+        };
+
+        const chart = new ApexCharts(document.querySelector("#chart-user-growth"), options);
+        chart.render();
+    }
+
+    showError() {
+        document.getElementById('dashboard-title').textContent = 'Error Loading Dashboard';
+        document.getElementById('dashboard-subtitle').textContent = 'Please check your data source';
+    }
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    new DashboardManager();
+});
+</script>
+{% endblock %}
