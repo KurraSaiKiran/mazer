@@ -1,6 +1,6 @@
 # Mazer Dashboard - Enhanced Analytics Version
 
-![Enhanced Mazer Dashboard](https://user-images.githubusercontent.com/45036724/167523601-9d20fb17-1989-488f-b619-cb53c0db8898.png)
+![Enhanced Mazer Dashboard](enhanced-dashboard-screenshot.png)
 
 <p align="center">Enhanced Mazer Admin Dashboard with modern analytics, interactive charts, and data-driven components.</p>
 
